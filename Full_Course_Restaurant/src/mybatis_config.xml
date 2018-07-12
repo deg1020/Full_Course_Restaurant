@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration 
+	PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-config.dtd" >
+
+<configuration>
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC"/>
+			<dataSource type="POOLED">
+				<property name="driver" value="oracle.jdbc.driver.OracleDriver"/>
+				<property name="url" value="jdbc:oracle:thin:@192.168.0.4:1521:xe"/>
+				<property name="username" value="HR"/>
+				<property name="password" value="HR"/>
+			</dataSource>
+		</environment>
+	</environments>
+	<mappers>
+		<mapper resource="accommodation.xml"/>
+		<mapper resource="Member.xml"/>
+		<mapper resource="restaurant.xml"/>
+		<mapper resource="review.xml"/>
+		<mapper resource="reservation.xml"/>
+	</mappers>
+</configuration>

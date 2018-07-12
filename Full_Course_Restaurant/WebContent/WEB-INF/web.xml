@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+	http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	version="3.0">
+	
+	<!-- review 후기 게시판  -->
+	
+	<servlet>			
+		<servlet-name>review</servlet-name>			
+		<servlet-class>								
+			org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>review</servlet-name>
+		<url-pattern>*.review</url-pattern>
+	</servlet-mapping>
+	
+	<!-- reservation -->
+	
+	<servlet>
+		<servlet-name>reservation</servlet-name>
+		<servlet-class>
+			org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>reservation</servlet-name>
+		<url-pattern>*.reserve</url-pattern>
+	</servlet-mapping>
+	
+	<!-- restaurant -->
+
+	<servlet>
+		<servlet-name>restaurant</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>restaurant</servlet-name>	
+		<url-pattern>*.donghwan</url-pattern>
+	</servlet-mapping>
+	
+	<!-- accommodation -->
+	
+	<servlet>
+		<servlet-name>accommodation</servlet-name>
+		<servlet-class>
+			org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>accommodation</servlet-name>
+		<url-pattern>*.ac</url-pattern>
+	</servlet-mapping>
+	
+	<!-- member -->	
+	
+	<servlet>
+		<servlet-name>member</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping> 
+		<servlet-name>member</servlet-name> 
+		<url-pattern>*.member</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>check</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping> 
+		<servlet-name>check</servlet-name> 
+		<url-pattern>*.check</url-pattern> 
+	</servlet-mapping>
+	
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>
+			org.springframework.web.filter.CharacterEncodingFilter
+		</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+</web-app>

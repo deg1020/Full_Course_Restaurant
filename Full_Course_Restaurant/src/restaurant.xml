@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN "
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	
+<mapper namespace="restaurant">
+
+	<!-- 등록페이지 음식점 정보 입력하는 부분 -->
+	<insert id='insert' parameterType="restaurant.RestaurantVo">
+		insert all
+		into restaurant(serial, rname, rtimeopen, rtimeclose, rholiday,
+					rbathroom, rdrink, rfacilities, raddress1, raddress2,
+					rdate, rhit, mid, rjuso, rmenus, rinfo, rtable, rphone)
+					
+		values(seq_rest.nextval, #{rname}, #{rtimeOpen}, #{rtimeClose}, #{rholiday},
+				#{rbathroom}, #{rdrink}, #{rfacilities}, #{raddress1}, #{raddress2},
+				sysdate, 0, #{mid}, #{rjuso}, #{rmenus}, #{rinfo}, ${rtable}, #{rphone} )
+	
+	<!-- 등록페이지 음식점 메뉴사진, 음식점 메인사진, 음식점 서브사진 입력하는 부분 -->		   
+		<foreach collection="map" index="key" item="value">
+			into restaurant_photo(serial, pserial, tagName, rmAttFile)
+			values(getRPSerial(), seq_rest.currval, #{value}, #{key})
+		</foreach>
+	 
+	 	select * from dual
+	 	
+	</insert>
+	
+	<!-- 등록페이지 음식점 메뉴 정보 입력하는 부분 -->
+	<insert id='insert2' parameterType="restaurant.RestaurantMenuVo">
+		insert into restaurant_menu(serial,pserial,rMname,rmexplain,rmprice)
+		values(seq_rest_menu.nextval,seq_rest.currval,#{rmName},#{rmExplain},#{rmPrice})
+	</insert>
+
+
+
+
+
+	<!-- 목록페이지 대표메뉴, 음식점간략설명, 음식점명 가져오는 부분 조회순 -->
+	<select id="select" parameterType="restaurant.RestaurantVo" 
+			resultType="restaurant.RestaurantVo">
+			select serial, rmenus, rinfo, rname
+			 from restaurant where raddress1 like '%${raddress1}%' 
+							   and raddress2 like '%${raddress2}%'
+					 		   and rname like '%${findStr}%'
+					 		   order by rhit desc 
+	</select>
+	
+	<!-- 목록페이지 대표메뉴, 음식점간략설명, 음식점명 가져오는 부분 등록일순 -->
+	<select id="select2" parameterType="restaurant.RestaurantVo" 
+			resultType="restaurant.RestaurantVo">
+			select serial, rmenus, rinfo, rname
+			 from restaurant where raddress1 like '%${raddress1}%' 
+							   and raddress2 like '%${raddress2}%'
+					 		   and rname like '%${findStr}%'
+					 		   order by rdate 
+	</select>
+	
+	<!-- 목록페이지 대표메뉴, 음식점간략설명, 음식점명 가져오는 부분 등록일순 -->
+	<select id="select4" parameterType="restaurant.RestaurantVo" 
+			resultType="restaurant.RestaurantVo">
+		select * from( 
+		select rownum rnum, b.* from ( 
+		  select a.*, ( select count(*) from restaurant_photo
+					  where a.serial=pserial )cnt 		
+		  from restaurant a 
+		  where raddress1 like '%${raddress1}%' 
+			and raddress2 like '%${raddress2}%'
+			and rname like '%${findStr}%' 	
+		  order by rdate )b 		
+		) 
+		where rnum between ${startNo} and ${endNo} 		
+	</select>
+	
+	<!-- 목록페이지 대표메뉴, 음식점간략설명, 음식점명 가져오는 부분 조회순 -->
+	<select id="select3" parameterType="restaurant.RestaurantVo" 
+			resultType="restaurant.RestaurantVo">
+		select * from( 
+		select rownum rnum, b.* from ( 
+		  select a.*, ( select count(*) from restaurant_photo
+					  where a.serial=pserial )cnt 		
+		  from restaurant a 
+		  where raddress1 like '%${raddress1}%' 
+			and raddress2 like '%${raddress2}%'
+			and rname like '%${findStr}%' 	
+		  order by rhit desc )b 		
+		) 
+		where rnum between ${startNo} and ${endNo} 		
+	</select>
+	
+
+	<!-- 목록페이지 음식점 메인 사진 가져오는 부분 -->
+	<select id="sel" parameterType="int"
+			resultType="restaurant.RestaurantPhotoVo">
+			select rmAttFile, pserial from restaurant_photo 
+			where pserial = ${_parameter} and tagname = 'rphoto_main'
+	</select>
+	
+	<!-- 페이지 불러오는 쿼리 -->
+	<select id="page" parameterType="String" resultType="int">
+		select count(*) totSize from restaurant
+		where rname like '%${_parameter}%'
+		and	  raddress1 like '%${_parameter}%'
+		and	  raddress2 like '%${_parameter}%'
+	</select>
+	
+
+
+
+
+	<!-- 상세보기 페이지, 수정페이지 에서 음식점 정보 전부 가져오는 부분 -->
+	<select id="view" parameterType="int" 
+			resultType="restaurant.RestaurantVo">
+			select * from restaurant
+			where serial = ${_parameter}
+	</select>
+	
+	<!-- 상세보기 페이지에서 조회수 1증가 시키는 쿼리 -->
+	 <update id="updateHitCnt" parameterType="int">
+         UPDATE restaurant
+         SET	rhit = NVL(rhit, 0) + 1
+         WHERE	serial = ${_parameter}
+	</update>
+
+	<!-- 상세보기 페이지에서 음식점 메인사진, 서브사진, 메뉴사진들 가져오는 부분 -->
+	<select id="photoView" parameterType="int" 
+			resultType="String">
+			select rmattfile from restaurant_photo
+			where pserial = ${_parameter} and tagname = 'rphoto_main'
+			
+	</select>
+	
+	<select id="photoView2" parameterType="int" 
+			resultType="String">
+			select rmattfile from restaurant_photo
+			where pserial = ${_parameter} and tagname like '%rphoto_sub%'
+	</select>
+	
+	<select id="photoView3" parameterType="int" 
+			resultType="restaurant.RestaurantPhotoVo">
+			select tagname, rmattfile from restaurant_photo
+			where pserial = ${_parameter} and tagname like '%rmAttFile%'
+	</select>
+	
+	<!-- 상세보기 페이지에서 음식점 메뉴정보 전부 가져오는 부분 -->
+	<select id="menuView" parameterType="int"
+			resultType="restaurant.RestaurantMenuVo" >
+			select * from restaurant_menu
+			where pserial = ${_parameter}
+			order by serial
+	</select>
+
+
+
+
+<!-- 수정페이지 에서  photo, menu 테이블 지웠다가 다시 입력 하는 부분 -->
+	<delete id="modifyDelete" parameterType="int">
+		delete from RESTAURANT_menu 
+		where pserial = ${_parameter}
+	</delete>
+	
+	<delete id="modifyDelete2" parameterType="int" >
+		delete from RESTAURANT_photo
+		where pserial = ${_parameter}
+	</delete>
+	
+	<!-- 기존에 있었던 변경전 메뉴 사진을 데이터베이스에서 삭제하는 쿼리 부분 -->
+	<delete id="modifyDelete3" parameterType="restaurant.RestaurantPhotoVo">
+		delete from RESTAURANT_photo
+		where pserial = ${pserial} and tagname = #{tagName}
+	</delete>
+	
+	
+	
+	
+	
+	<!-- 삭제할 사진 파일명들 가져오기 -->
+	<select id="photoFileDelete" parameterType="int" resultType="restaurant.RestaurantPhotoVo">
+		select * from RESTAURANT_PHOTO where pserial = #{_parameter}
+	</select>
+	
+	<select id="photoFileDelete2" parameterType="restaurant.RestaurantPhotoVo"
+			resultType="restaurant.RestaurantPhotoVo" >
+		select * from RESTAURANT_PHOTO 
+		where pserial = #{pserial} and tagName = #{tagName}
+	</select>
+	
+
+	<update id="rvoModify" parameterType="restaurant.RestaurantVo">
+		UPDATE 	restaurant 
+		SET		rname = #{rname}, rtimeopen = #{rtimeOpen}, 
+				rtimeClose = #{rtimeClose}, rholiday = #{rholiday},
+				rbathroom = #{rbathroom}, rdrink = #{rdrink},
+				rfacilities = #{rfacilities}, raddress1 = #{raddress1},
+				raddress2 = #{raddress2},
+				mid = #{mid}, rjuso = #{rjuso},
+				rmenus = #{rmenus}, rinfo = #{rinfo},
+				rtable = ${rtable}, rphone = #{rphone} 
+		WHERE 	serial = ${serial}
+	</update>
+
+	<!-- 수정페이지 메뉴들 삭제후에 다시 등록하는 쿼리 부분 -->
+	<insert id='modifyInsert' parameterType="restaurant.RestaurantMenuVo">
+		insert into restaurant_menu(serial,pserial,
+								rMname,rmexplain,rmprice)
+		values(seq_rest_menu.nextval,${pserial},
+						#{rmName},#{rmExplain},#{rmPrice})
+	</insert>
+	
+	<!-- 수정페이지 사진들 삭제 후에 다시 등록하는 쿼리 부분 -->		   
+	<insert id="modifyInsert2" parameterType="restaurant.RestaurantPhotoVo">
+			insert into restaurant_photo(serial, pserial, tagname, rmAttFile)
+			values(getRPSerial(), ${pserial}, #{tagName}, #{rmAttFile})
+	</insert>	
+	
+	<update id="modifyUpdate2" parameterType="restaurant.RestaurantPhotoVo">
+		UPDATE 	restaurantphoto 
+		SET		rmAttFile = #{rmAttFile}
+		WHERE 	pserial = ${pserial} and tagName = #{tagName}
+	</update>
+	
+	<insert id="modifyInsert3" parameterType="restaurant.RestaurantPhotoVo">
+		insert into restaurant_photo(serial, pserial, tagname, rmAttFile)
+			values(seq_rest_photo.nextval, ${pserial}, #{tagName}, #{rmAttFile})
+	</insert>
+	
+	
+	
+	
+	<!-- 음식점 전체 정보 삭제 하는 쿼리 부분 -->
+	<delete id="delete" parameterType="int">
+		delete from RESTAURANT
+		where serial = ${_parameter}
+	</delete>
+	
+	
+	
+	
+	
+	
+	
+	
+</mapper>
